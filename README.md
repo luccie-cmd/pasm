@@ -16,4 +16,4 @@
 
 ---------------------------------------
 ### NOTES
-###### The line at jmp and jz are 0 based indexes same for the register it is 8 bit with the first one being register zero
+###### The line at jmp and jz are 0 based indexes same for the register it is 8 bit with the first one being register zero and the last being 7
