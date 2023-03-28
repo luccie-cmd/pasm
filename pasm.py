@@ -1,4 +1,4 @@
-import sys
+import sys, time
 
 register = [
     "0",
@@ -13,49 +13,60 @@ register = [
 MUST = [
     'hlt',
 ]
+
+def read_file(file: str):
+    with open(file, "r") as f:
+        return f.readlines()
+
+class Operations:
+    def ldi(self, addr, data):
+        register[int(addr)] = data
+    def read(self, addr):
+        print(register[int(addr)])
+    def add(self, data):
+        dst = data[1]
+        addr1, addr2 = data[2], data[3]
+        register[int(dst)] = int(register[int(addr1)]) + int(register[int(addr2)])
+    def sub(self, data):
+        dst = data[1]
+        addr1, addr2 = data[2], data[3]
+        register[int(dst)] = int(register[int(addr1)]) - int(register[int(addr2)])
+    def jmp(self, data):
+        return int(data[1])
+    def jz(self, data, line):
+        addr = data[1]
+        if register[int(data[1])] == "0" or register[int(addr)] == 0:
+            return int(data[2])
+        return line+1
             
-def logic(f_data):
+def logic(f_data, ops):
+    line = 0
     stack = []
-    pc = 0
-    for m in MUST:
-        if m not in f_data:
-            print("%s, is not found in file" %m)
-            exit(1)
-    while pc < len(f_data):
-        ip = pc
-        op = f_data[pc]
-        if op == 'ldi':
-            addr = f_data[ip+1]
-            data = f_data[ip+2]
-            register[int(addr)] = data
-            pc += 1
+    while line < len(f_data):
+        data = f_data[line].strip().split()
+        op = data[0]
+        if op == '//':
+            line+=1
+            continue
+        elif op == 'ldi':
+            ops.ldi(data[1], data[2])
         elif op == 'read':
-            addr = f_data[ip+1]
-            print(register[int(addr)])
-            pc += 1
+            ops.read(data[1])
         elif op == 'add':
-            dst = f_data[ip+1]
-            addr1, addr2 = f_data[ip+2], f_data[ip+3]
-            register[int(dst)] = int(register[int(addr1)]) + int(register[int(addr2)])
-            pc += 1
+            ops.add(data)
         elif op == 'sub':
-            dst = f_data[ip+1]
-            addr1, addr2 = f_data[ip+2], f_data[ip+3]
-            register[int(dst)] = int(register[int(addr1)]) - int(register[int(addr2)])
-            pc += 1
+            ops.sub(data)
+        elif op == 'jmp':
+            line = ops.jmp(data)
+            continue
+        elif op == 'jz':
+            line = ops.jz(data, line)
+            continue
         elif op == 'hlt':
-            pc = len(f_data)
-        else:
-            try:
-                stack.append(int(op))
-                pc += 1
-            except ValueError:
-                if op in MUST:
-                    pc += 1
-                    continue
-                print("Invalid word: %s" %op)
-                break
+            break
+        line+=1
             
-with open("main.pasm", "r") as f:
-    f_data = f.read().split()
-    logic(f_data)
+
+if __name__ == '__main__':
+    ops = Operations()
+    logic(read_file(sys.argv[1]), ops)
