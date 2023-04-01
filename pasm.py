@@ -38,6 +38,11 @@ class Operations:
             register[int(addr)] = int(data)
         except ValueError:
             register[int(addr)] = hex(data)
+    def mov(self, addr1, addr2):
+        try:
+            register[int(addr1)] = register[int(addr2)]
+        except ValueError:
+            Error().__code1__(addr1)
     def read(self, addr):
         try:
             print(register[int(addr)])
@@ -117,6 +122,8 @@ def logic(f_data, ops):
             continue
         elif op == 'ldi':
             ops.ldi(data[1], int(data[2], base=0))
+        elif op == 'mov':
+            ops.mov(int(data[1], base=0), int(data[2], base=0))
         elif op == 'read':
             ops.read(data[1])
         elif op == 'print':
@@ -143,7 +150,7 @@ def logic(f_data, ops):
         elif op == 'hlt':
             break
         else:
-            print("%s:%s: %s is not a valid instruction" %(sys.argv[1], line, op))
+            print("%s:%s: %s is not a valid instruction" %(sys.argv[1], line+1, op))
         line+=1
             
 

@@ -5,6 +5,7 @@
 ### FUCTIONS
 ```
     ldi <addr> <data> = load the register at the addres with the data
+    mov <addr1> <addr2> = moves addr2 into addr1
     read <addr> = prints the data at the register of addres
     print <str> = prints the str
     add <dst> <addr1> <addr2> = sets the register at dst to addres1 plus addres2
