@@ -25,7 +25,7 @@ class Error:
     def __code1__(self, addr):
         print("%s can not pe parsed at a integer for the addres" %addr)
         quit(1)
-    def __code2__(self, m):
+    def __code2__(self):
         print("Not all specifiers met for a good program\nexit code 2")
         quit(2)
     def __code3__(self, file):
@@ -43,6 +43,15 @@ class Operations:
             print(register[int(addr)])
         except ValueError:
             Error().__code1__(addr)
+    def print(self, addr):
+        try:
+            n_str = ""
+            for d in addr:
+                n_str += d
+                n_str += " "
+            print(n_str.strip('"'))
+        except ValueError:
+            Error().__code1__(addr)
     def add(self, data):
         try:
             dst = data[1]
@@ -55,6 +64,20 @@ class Operations:
             dst = data[1]
             addr1, addr2 = data[2], data[3]
             register[int(dst)] = int(register[int(addr1)]) - int(register[int(addr2)])
+        except ValueError:
+            Error().__code1__(data[1])
+    def mul(self, data):
+        try:
+            dst = data[1]
+            addr1, addr2 = data[2], data[3]
+            register[int(dst)] = int(register[int(addr1)]) * int(register[int(addr2)])
+        except ValueError:
+            Error().__code1__(data[1])
+    def div(self, data):
+        try:
+            dst = data[1]
+            addr1, addr2 = data[2], data[3]
+            register[int(dst)] = int(register[int(addr1)]) // int(register[int(addr2)])
         except ValueError:
             Error().__code1__(data[1])
     def inc(self, addr):
@@ -83,7 +106,6 @@ class Operations:
             
 def logic(f_data, ops):
     line = 0
-    stack = []
     for m in MUST:
         if m not in f_data:
             Error().__code2__()
@@ -97,10 +119,17 @@ def logic(f_data, ops):
             ops.ldi(data[1], int(data[2], base=0))
         elif op == 'read':
             ops.read(data[1])
+        elif op == 'print':
+            data.pop(0)
+            ops.print(data)
         elif op == 'add':
             ops.add(data)
         elif op == 'sub':
             ops.sub(data)
+        elif op == 'div':
+            ops.div(data)
+        elif op == 'mul':
+            ops.mul(data)
         elif op == 'inc':
             ops.inc(data[1])
         elif op == 'dec':
