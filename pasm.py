@@ -1,35 +1,41 @@
 import sys, time
 
 register = [
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0", 
-    "0",
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0, 
+    0,
 ]
 MUST = [
     'hlt',
 ]
 
 def read_file(file: str):
-    with open(file, "r") as f:
-        return f.readlines()
+    try:
+        with open(file, "r") as f:
+            return f.readlines()
+    except FileNotFoundError:
+        Error().__code3__(file)
 
 class Error:
     def __code1__(self, addr):
         print("%s can not pe parsed at a integer for the addres" %addr)
         quit(1)
     def __code2__(self, m):
-        print("%s Not all specifiers met for a good program\nexit code 2" %m)
+        print("Not all specifiers met for a good program\nexit code 2")
         quit(2)
+    def __code3__(self, file):
+        print("pasm: fatal: unable to open input file `%s` No such file or directory" %file)
+        quit(3)
 
 class Operations:
     def ldi(self, addr, data):
         try:
-            register[int(addr)] = data
+            register[int(addr)] = int(data)
         except ValueError:
             Error().__code1__(addr)
     def read(self, addr):
@@ -51,6 +57,16 @@ class Operations:
             register[int(dst)] = int(register[int(addr1)]) - int(register[int(addr2)])
         except ValueError:
             Error().__code1__(data[1])
+    def inc(self, addr):
+        try:
+            register[int(addr)] += 1
+        except ValueError:
+            Error().__code1__(addr)
+    def dec(self, addr):
+        try:
+            register[int(addr)] -= 1
+        except ValueError:
+            Error().__code1__(addr)
     def jmp(self, data):
         try:
             return int(data[1])
@@ -70,7 +86,7 @@ def logic(f_data, ops):
     stack = []
     for m in MUST:
         if m not in f_data:
-            Error().__code2__(m)
+            Error().__code2__()
     while line < len(f_data):
         data = f_data[line].strip().split()
         op = data[0]
@@ -85,6 +101,10 @@ def logic(f_data, ops):
             ops.add(data)
         elif op == 'sub':
             ops.sub(data)
+        elif op == 'inc':
+            ops.inc(data[1])
+        elif op == 'dec':
+            ops.dec(data[1])
         elif op == 'jmp':
             line = ops.jmp(data)
             continue
