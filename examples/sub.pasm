@@ -5,3 +5,4 @@ jz 2 6
 sub 2 2 1
 jmp 2
 hlt
+good

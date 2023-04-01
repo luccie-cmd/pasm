@@ -18,30 +18,59 @@ def read_file(file: str):
     with open(file, "r") as f:
         return f.readlines()
 
+class Error:
+    def __code1__(self, addr):
+        print("%s can not pe parsed at a integer for the addres" %addr)
+        quit(1)
+    def __code2__(self, m):
+        print("%s Not all specifiers met for a good program\nexit code 2" %m)
+        quit(2)
+
 class Operations:
     def ldi(self, addr, data):
-        register[int(addr)] = data
+        try:
+            register[int(addr)] = data
+        except ValueError:
+            Error().__code1__(addr)
     def read(self, addr):
-        print(register[int(addr)])
+        try:
+            print(register[int(addr)])
+        except ValueError:
+            Error().__code1__(addr)
     def add(self, data):
-        dst = data[1]
-        addr1, addr2 = data[2], data[3]
-        register[int(dst)] = int(register[int(addr1)]) + int(register[int(addr2)])
+        try:
+            dst = data[1]
+            addr1, addr2 = data[2], data[3]
+            register[int(dst)] = int(register[int(addr1)]) + int(register[int(addr2)])
+        except ValueError:
+            Error().__code1__(data[1])
     def sub(self, data):
-        dst = data[1]
-        addr1, addr2 = data[2], data[3]
-        register[int(dst)] = int(register[int(addr1)]) - int(register[int(addr2)])
+        try:
+            dst = data[1]
+            addr1, addr2 = data[2], data[3]
+            register[int(dst)] = int(register[int(addr1)]) - int(register[int(addr2)])
+        except ValueError:
+            Error().__code1__(data[1])
     def jmp(self, data):
-        return int(data[1])
+        try:
+            return int(data[1])
+        except ValueError:
+            Error().__code1__(data[1])
     def jz(self, data, line):
-        addr = data[1]
-        if register[int(data[1])] == "0" or register[int(addr)] == 0:
-            return int(data[2])
+        try:
+            addr = data[1]
+            if register[int(data[1])] == "0" or register[int(addr)] == 0:
+                return int(data[2])
+        except ValueError:
+            Error().__code1__(data[1])
         return line+1
             
 def logic(f_data, ops):
     line = 0
     stack = []
+    for m in MUST:
+        if m not in f_data:
+            Error().__code2__(m)
     while line < len(f_data):
         data = f_data[line].strip().split()
         op = data[0]
@@ -64,6 +93,8 @@ def logic(f_data, ops):
             continue
         elif op == 'hlt':
             break
+        else:
+            print("%s:%s: %s is not a valid instruction" %(sys.argv[1], line, op))
         line+=1
             
 
