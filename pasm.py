@@ -37,7 +37,7 @@ class Operations:
         try:
             register[int(addr)] = int(data)
         except ValueError:
-            Error().__code1__(addr)
+            register[int(addr)] = hex(data)
     def read(self, addr):
         try:
             print(register[int(addr)])
@@ -94,7 +94,7 @@ def logic(f_data, ops):
             line+=1
             continue
         elif op == 'ldi':
-            ops.ldi(data[1], data[2])
+            ops.ldi(data[1], int(data[2], base=0))
         elif op == 'read':
             ops.read(data[1])
         elif op == 'add':
